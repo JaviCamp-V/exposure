@@ -17,19 +17,16 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
-EXPOSE 3000
+EXPOSE 8080
 
 RUN addgroup --system --gid 1001 nodejs \
     && adduser  --system --uid 1001 nextjs \
     && chown -R nextjs:nodejs /app
 USER nextjs
 
+COPY --from=builder /app/.next/standalone/* ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
-RUN mkdir standalone
-COPY --from=builder /app/.next/standalone       ./standalone
-COPY --from=builder /app/.next/static           ./.next/static
-COPY --from=builder /app/public                  ./public
-
-WORKDIR /app/standalone
 CMD ["node", "server.js"]
     
